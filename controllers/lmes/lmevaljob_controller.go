@@ -854,7 +854,7 @@ func unmarshal(custom string, props []string) (map[string]interface{}, error) {
 }
 
 func CreatePod(svcOpts *serviceOptions, job *lmesv1alpha1.LMEvalJob, log logr.Logger) *corev1.Pod {
-
+	log.Info("MM Creating pod for job", "job", job.Name)
 	var envVars = removeProtectedEnvVars(job.Spec.Pod.GetContainer().GetEnv())
 
 	disableTelemetryEnvVars := []corev1.EnvVar{
@@ -878,6 +878,7 @@ func CreatePod(svcOpts *serviceOptions, job *lmesv1alpha1.LMEvalJob, log logr.Lo
 	}
 
 	if job.Spec.Outputs != nil && (job.Spec.Outputs.HasManagedPVC() || job.Spec.Outputs.HasExistingPVC()) {
+		log.Info("MM adding output PVC volume mount")
 		outputPVCMount := corev1.VolumeMount{
 			Name:      "outputs",
 			MountPath: OutputPath,
@@ -1125,6 +1126,7 @@ func CreatePod(svcOpts *serviceOptions, job *lmesv1alpha1.LMEvalJob, log logr.Lo
 
 	// Always add OCI env vars if configured, regardless of offline/online mode
 	if job.Spec.HasOCIOutput() && job.Spec.Outputs != nil && job.Spec.Outputs.OCISpec != nil {
+		log.Info("MM adding OCI env vars")
 		ociEnvVars := []corev1.EnvVar{
 			{
 				Name: "OCI_REGISTRY",
